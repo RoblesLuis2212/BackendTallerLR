@@ -37,11 +37,9 @@ export const listarProductos = async (req, res) => {
 
 export const eliminarProducto = async (req, res) => {
   try {
-    const { id } = req.params;
-
-    const producto = await prisma.producto.delete({
+    await prisma.producto.delete({
       where: {
-        id_producto: Number(id),
+        id_producto: Number(req.params.id),
       },
     });
 
@@ -54,5 +52,44 @@ export const eliminarProducto = async (req, res) => {
     res
       .status(500)
       .json({ mensaje: "Ocurrio un error al eliminar el producto" });
+  }
+};
+
+export const obtenerProductoID = async (req, res) => {
+  try {
+    const producto = await prisma.producto.findUnique({
+      where: {
+        id_producto: Number(req.params.id),
+      },
+    });
+
+    res.status(200).json(producto);
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status({ mensaje: "El producto no existe" });
+    }
+    console.error(err);
+    res
+      .status(500)
+      .json({ mensaje: "Ocurrio un error al obtener el producto" });
+  }
+};
+
+export const editarProducto = async (req, res) => {
+  try {
+    await prisma.producto.update({
+      where: {
+        id_producto: Number(req.params.id),
+      },
+      data: req.body,
+    });
+
+    res.status(200).json({ mensaje: "Producto actualizado correctamente" });
+  } catch (err) {
+    if (err.code === "P2025") {
+      return res.status(404).json({ mensaje: "El producto no existe" });
+    }
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al editar el producto" });
   }
 };
