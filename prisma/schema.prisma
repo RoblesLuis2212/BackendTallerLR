@@ -1,0 +1,133 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+//Estado perteneciente a la tabla productos
+enum estado {
+  DISPONIBLE
+  NO_DISPONIBLE
+}
+
+model Producto {
+  id_producto     Int     @id @default(autoincrement())
+  nombre          String
+  descripcion     String?
+  categoria       String?
+  precio_unitario Decimal
+  stock           Int
+  tamanio         String?
+  estado          estado  @default(DISPONIBLE)
+}
+
+model Cliente {
+  id_cliente     Int      @id @default(autoincrement())
+  nombre         String
+  dni            String   @unique
+  telefono       String
+  email          String   @unique
+  fecha_registro DateTime @default(now())
+
+  vehiculos Vehiculo[]
+  turnos    Turno[]
+}
+
+//Tipo de vehiculos
+enum tipo {
+  AUTO
+  MOTO
+  CAMIONETA
+}
+
+model Vehiculo {
+  id_vehiculo Int      @id @default(autoincrement())
+  marca       String?
+  modelo      String?
+  anio        Int?
+  patente     String   @unique
+  color       String
+  tipo        tipo?
+  fechaAlta   DateTime @default(now())
+  cliente_Id  Int
+  cliente     Cliente  @relation(fields: [cliente_Id], references: [id_cliente])
+
+  turnos Turno[]
+}
+
+model Empleado {
+  id_empleado    Int      @id @default(autoincrement())
+  nombre         String
+  dni            String   @unique
+  telefono       String
+  puesto         String
+  fecha_Registro DateTime @default(now())
+  salario        Decimal
+
+  usuarios Usuario[]
+  turnos   Turno[]
+}
+
+//Roles perteneciente a la tabla Usuario
+enum rol {
+  ADMIN
+  EMPLEADO
+}
+
+enum estadoUsuario {
+  ACTIVO
+  INACTIVO
+  SUSPENDIDO
+}
+
+model Usuario {
+  id_usuario  Int           @id @default(autoincrement())
+  usuario     String
+  password    String
+  rol         rol
+  estado      estadoUsuario @default(ACTIVO)
+  id_Empleado Int
+  empleado    Empleado      @relation(fields: [id_Empleado], references: [id_empleado])
+}
+
+enum estadoServicio {
+  DISPONIBLE
+  NO_DISPONIBLE
+}
+
+model servicio {
+  id_servicio     Int     @id @default(autoincrement())
+  nombre_servicio String
+  descripcion     String
+  precio_estimado Decimal
+  estado_servicio estado  @default(DISPONIBLE)
+}
+
+enum estadoTurno {
+  PENDIENTE
+  COMPLETADO
+}
+
+model Turno {
+  id_turno      Int         @id @default(autoincrement())
+  id_Cliente    Int
+  id_Empleado   Int?
+  id_Vehiculo   Int
+  fecha_Turno   DateTime    @default(now())
+  motivo        String?
+  estado        estadoTurno @default(PENDIENTE)
+  observaciones String?
+
+  cliente  Cliente   @relation(fields: [id_Cliente], references: [id_cliente])
+  empleado Empleado? @relation(fields: [id_Empleado], references: [id_empleado])
+  vehiculo Vehiculo  @relation(fields: [id_Vehiculo], references: [id_vehiculo])
+}
