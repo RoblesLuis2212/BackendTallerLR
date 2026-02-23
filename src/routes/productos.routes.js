@@ -2,6 +2,6 @@ import { Router } from "express";
 import { agregarProducto } from "../controllers/productos.controllers.js";
 
 const router = Router();
-router.route("/").get(agregarProducto);
+router.route("/").post(agregarProducto);
 
 export default router;
