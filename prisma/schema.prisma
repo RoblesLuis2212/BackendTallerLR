@@ -73,8 +73,9 @@ model Empleado {
   fecha_Registro DateTime @default(now())
   salario        Decimal
 
-  usuarios Usuario[]
-  turnos   Turno[]
+  usuarios   Usuario[]
+  turnos     Turno[]
+  asistencia Asistencia[]
 }
 
 //Roles perteneciente a la tabla Usuario
@@ -130,4 +131,18 @@ model Turno {
   cliente  Cliente   @relation(fields: [id_Cliente], references: [id_cliente])
   empleado Empleado? @relation(fields: [id_Empleado], references: [id_empleado])
   vehiculo Vehiculo  @relation(fields: [id_Vehiculo], references: [id_vehiculo])
+}
+
+enum tipoAsistencia {
+  ENTRADA
+  SALIDA
+}
+
+model Asistencia {
+  id_asistencia Int            @id @default(autoincrement())
+  id_Empleado   Int
+  fecha         DateTime       @default(now())
+  tipo          tipoAsistencia
+
+  empleado Empleado @relation(fields: [id_Empleado], references: [id_empleado])
 }
