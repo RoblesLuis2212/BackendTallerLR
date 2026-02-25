@@ -93,3 +93,22 @@ export const editarProducto = async (req, res) => {
     res.status(500).json({ mensaje: "Ocurrio un error al editar el producto" });
   }
 };
+
+export const filtrarProductoNombre = async (req, res) => {
+  try {
+    const { nombre } = req.query;
+
+    const productos = await prisma.producto.findMany({
+      where: {
+        nombre: {
+          contains: nombre,
+          mode: "insensitive",
+        },
+      },
+    });
+    res.status(200).json(productos);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ mensaje: "Ocurrio un error al filtrar productos" });
+  }
+};
